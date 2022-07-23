@@ -100,7 +100,12 @@ jobs:
           asset_path: ${{ runner.WORKSPACE }}/nupkgs/release.zip
           asset_name: release.zip
           asset_content_type: application/zip
-          
+      
+      - name: Content list
+        uses: enricomarino/actions@v2
+        with:
+          source: ${{ runner.WORKSPACE }}/nupkgs/*.nupkg
+    
       # Release to NUGET.ORG
       - name: Setup NuGet.exe for use with actions
         if: ${{ env.Enable_Nuget_Release }}
@@ -108,6 +113,6 @@ jobs:
 
       - name: Publish Nuget
         if: ${{ env.Enable_Nuget_Release }}
-        run: nuget push ${{ runner.WORKSPACE }}/nupkgs/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_PACKAGE_TOKEN }}
+        run: nuget push ${{ runner.WORKSPACE }}/nupkgs/*.nupkg -SkipDuplicate -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_PACKAGE_TOKEN }}
       
       
