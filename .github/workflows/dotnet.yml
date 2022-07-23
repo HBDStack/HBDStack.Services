@@ -103,6 +103,6 @@ jobs:
       
       - name: Publish Nuget
         if: ${{ env.Enable_Nuget_Release }}
-        run: dotnet nuget push ${{ runner.WORKSPACE }}/nupkgs/*.nupkg --skip-duplicate --source github --api-key ${{ secrets.NUGET_PACKAGE_TOKEN }}
+        run: dotnet nuget push ${{ runner.WORKSPACE }}/nupkgs/*.nupkg --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_PACKAGE_TOKEN }}
       
       
