@@ -101,18 +101,8 @@ jobs:
           asset_name: release.zip
           asset_content_type: application/zip
       
-      - name: Content list
-        uses: enricomarino/actions@v2
-        with:
-          source: ${{ runner.WORKSPACE }}/nupkgs/*.nupkg
-    
-      # Release to NUGET.ORG
-      - name: Setup NuGet.exe for use with actions
-        if: ${{ env.Enable_Nuget_Release }}
-        uses: NuGet/setup-nuget@v1.0.6
-
       - name: Publish Nuget
         if: ${{ env.Enable_Nuget_Release }}
-        run: nuget push ${{ runner.WORKSPACE }}/nupkgs/*.nupkg -SkipDuplicate -Source https://api.nuget.org/v3/index.json -ApiKey ${{ secrets.NUGET_PACKAGE_TOKEN }}
+        run: dotnet nuget push ${{ runner.WORKSPACE }}/nupkgs/*.nupkg --skip-duplicate --source github --api-key ${{ secrets.NUGET_PACKAGE_TOKEN }}
       
       
