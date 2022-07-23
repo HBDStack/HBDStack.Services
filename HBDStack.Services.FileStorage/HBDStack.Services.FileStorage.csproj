@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Title></Title>
+        <Authors>Duy Hoang</Authors>
+        <Copyright>@2022 drunkcoding</Copyright>
+        <Description></Description>
+        <Copyright>MIT</Copyright>
+        <PackageProjectUrl>https://github.com/HBDStack/HBDStack.Services</PackageProjectUrl>
+        <PackageIcon>NugetLogo.png</PackageIcon>
+        <RepositoryUrl>https://github.com/HBDStack/HBDStack.Services</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>file storage, upload</PackageTags>
+        <ImplicitUsings>true</ImplicitUsings>
+        <PackageVersion />
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Azure.Storage.Blobs" Version="12.12.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="NugetLogo.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+    </ItemGroup>
+
+</Project>

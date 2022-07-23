@@ -1,0 +1,35 @@
+﻿{
+  "ConnectionStrings": {
+    "DefaultConnection": "DataSource=app.db"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+
+  "Smtp": {
+    "Host": "smtp-relay.sendinblue.com",
+    "Port": 587,
+    "UserName": "baoduy2412@yahoo.com",
+    "Password": "xsmtpsib-1f62d02b1f400f06a80809dbd5bfebdeee0d3b75ae035d8fc01220b3e00e8489-LQ9j4Tc5fSwvDJ2F",
+    "EnableSsl": true,
+    "FromEmail": "test@hysky.tech",
+
+    "Templates": [
+      {
+        "Name": "Duy1",
+        "Subject": "Test Email",
+        "Body": "Hello [Name]",
+        "BodyHtml": false
+      },
+      {
+        "Name": "Duy2",
+        "Subject": "Test Email",
+        "BodyFile": "TestData/Body.html",
+        "BodyHtml": true
+      }
+    ]
+  }
+}

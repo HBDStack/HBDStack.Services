@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Authors>Duy Hoang</Authors>
+        <Company>HBD</Company>
+        <Copyright>@2022 drunkcoding</Copyright>
+        <PackageProjectUrl>https://github.com/HBDStack/HBDStack.Services</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/HBDStack/HBDStack.Services</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>State management, PostgreSql state storage</PackageTags>
+        <PackageReleaseNotes>
+        </PackageReleaseNotes>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <LangVersion>default</LangVersion>
+        <PackageIcon>NugetLogo.png</PackageIcon>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Update="NugetLogo.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\HBDStack.Services.StateManagement\HBDStack.Services.StateManagement.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <InternalsVisibleTo Include="HBDStack.Services.StateManagement.Storages.PostgreSql.Tests" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.4" />
+    </ItemGroup>
+</Project>

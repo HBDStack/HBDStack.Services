@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Authors>Duy Hoang</Authors>
+        <Company>HBD</Company>
+        <Copyright>@2022 drunkcoding</Copyright>
+        <PackageProjectUrl>https://github.com/HBDStack/HBDStack.Services</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/HBDStack/HBDStack.Services</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>State management, SQL state storage</PackageTags>
+        <PackageReleaseNotes>
+        </PackageReleaseNotes>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <LangVersion>default</LangVersion>
+        <PackageIcon>NugetLogo.png</PackageIcon>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>true</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\HBDStack.Services.StateManagement\HBDStack.Services.StateManagement.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="HBDStack.Services.StateManagement.Storages.Sql.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="NugetLogo.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+      </None>
+    </ItemGroup>
+</Project>

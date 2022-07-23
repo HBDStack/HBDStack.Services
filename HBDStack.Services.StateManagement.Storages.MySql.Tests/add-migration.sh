@@ -1,0 +1,1 @@
+dotnet ef migrations add $1 -c MySqlStateContext -o Migrations -p ../HBD.Services.StateManagement.Storages.MySql/HBD.Services.StateManagement.Storages.MySql.csproj -s HBD.Services.StateManagement.Storages.MySql.Tests.csproj

@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Authors>Duy Hoang</Authors>
+        <Company>HBD</Company>
+        <Copyright>@2022 drunkcoding</Copyright>
+        <PackageProjectUrl>https://github.com/HBDStack/HBDStack.Services</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/HBDStack/HBDStack.Services</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <Version>1.2.0</Version>
+        <PackageTags>Email,Notification Templates</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Owners>Duy Hoang</Owners>
+        <Summary>The servie that allow to send email notification from config file or predefined templates.</Summary>
+        <Title>HBD.Services.Email</Title>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <LangVersion>default</LangVersion>
+        <Nullable>disable</Nullable>
+        <TargetFramework>net6.0</TargetFramework>
+        <PackageIcon>NugetLogo.png</PackageIcon>
+        <ImplicitUsings>true</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="HBDStack.Services.Email.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+        <PackageReference Include="System.Text.Json" Version="6.0.5" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Builders\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\HBD.Services.Transformation\HBDStack.Services.Transformation\HBDStack.Services.Transformation.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="NugetLogo.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
+    </ItemGroup>
+</Project>

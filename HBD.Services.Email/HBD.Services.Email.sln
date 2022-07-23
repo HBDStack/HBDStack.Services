@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29411.108
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HBD.Services.Email", "HBD.Services.Email\HBD.Services.Email.csproj", "{2302FBA6-C5AC-4EE8-9419-30052CAEEB9E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HBD.Services.Email.Tests", "HBD.Services.Email.Tests\HBD.Services.Email.Tests.csproj", "{D15288FF-7A02-4CBB-8FC0-B953C4854145}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CC8C91A4-50E2-4E80-AF26-525B0F6B93F5}"
+	ProjectSection(SolutionItems) = preProject
+		ReadMe.md = ReadMe.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2302FBA6-C5AC-4EE8-9419-30052CAEEB9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2302FBA6-C5AC-4EE8-9419-30052CAEEB9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2302FBA6-C5AC-4EE8-9419-30052CAEEB9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2302FBA6-C5AC-4EE8-9419-30052CAEEB9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D15288FF-7A02-4CBB-8FC0-B953C4854145}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D15288FF-7A02-4CBB-8FC0-B953C4854145}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D15288FF-7A02-4CBB-8FC0-B953C4854145}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D15288FF-7A02-4CBB-8FC0-B953C4854145}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {426905B4-4E14-4DEB-A037-97D0DE722961}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,1 @@
+dotnet ef migrations add $1 -c PostgreSqlStateContext -o Migrations -p ../HBD.Services.StateManagement.Storages.PostgreSql/HBD.Services.StateManagement.Storages.PostgreSql.csproj -s HBD.Services.StateManagement.Storages.PostgreSql.Tests.csproj

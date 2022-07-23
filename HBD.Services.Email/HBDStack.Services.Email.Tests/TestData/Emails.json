@@ -1,0 +1,20 @@
+﻿[
+  {
+    "Name": "Duy1",
+    "ToEmails": "baoduy2412@yahoo.com,[Duy];[OtherEmail]",
+    "CcEmails": "baoduy2412@yahoo.com,[Duy];[OtherEmail]",
+    "BccEmails": "baoduy2412@yahoo.com,[Duy];[OtherEmail]",
+    "Subject": "Test Email",
+    "Body": "Hello [Name]",
+    "BodyHtml": false
+  },
+  {
+    "Name": "Duy2",
+    "ToEmails": "baoduy2412@yahoo.com,[Duy];[OtherEmail]",
+    "CcEmails": "baoduy2412@yahoo.com,[Duy];[OtherEmail]",
+    "BccEmails": "baoduy2412@yahoo.com,[Duy];[OtherEmail]",
+    "Subject": "Test Email",
+    "BodyFile": "TestData/Body.html",
+    "BodyHtml": true
+  }
+]
