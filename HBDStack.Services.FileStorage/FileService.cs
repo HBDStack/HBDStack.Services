@@ -1,19 +1,15 @@
 using System.Text;
 using HBDStack.Services.FileStorage.Abstracts;
-using Microsoft.Extensions.Logging;
 
 namespace HBDStack.Services.FileStorage;
 
 public class FileService : IFileService
 {
     private readonly IFileAdapter[] _adapters;
-    private readonly ILogger<FileService> _logger;
 
-    public FileService(IEnumerable<IFileAdapter> adapters, ILogger<FileService> logger)
+    public FileService(IEnumerable<IFileAdapter> adapters)
     {
         _adapters = adapters.ToArray();
-        _logger = logger;
-
         if (!_adapters.Any()) throw new ArgumentException("No adapter found.");
     }
 

@@ -1,6 +1,7 @@
 using FluentAssertions;
+using HBDStack.Services.FileStorage.AzureAdapters;
 using HBDStack.Services.FileStorage.Abstracts;
-using HBDStack.Services.FileStorage.Options;
+using HBDStack.Services.FileStorage.Adapters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -22,7 +23,7 @@ public class AzureStorageAdapterTest
             new ServiceCollection()
                 .AddLogging()
                 .AddSingleton<IFileAdapter, AzureStorageAdapter>()
-                .Configure<AzureStorageOptions>(o => config.GetSection(AzureStorageOptions.Name).Bind(o))
+                .AddAzureStorageAdapter(config)
                 .BuildServiceProvider();
 
         _adapter = service.GetRequiredService<IFileAdapter>();

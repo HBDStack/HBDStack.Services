@@ -1,22 +1,16 @@
 using Azure.Storage.Blobs;
 using HBDStack.Services.FileStorage.Abstracts;
-using HBDStack.Services.FileStorage.Options;
-using Microsoft.Extensions.Logging;
+using HBDStack.Services.FileStorage.Adapters;
 using Microsoft.Extensions.Options;
 
-namespace HBDStack.Services.FileStorage;
+namespace HBDStack.Services.FileStorage.AzureAdapters;
 
 public class AzureStorageAdapter : IFileAdapter
 {
-    private readonly ILogger<AzureStorageAdapter> _logger;
     private readonly AzureStorageOptions _options;
     private BlobContainerClient? _containerClient;
 
-    public AzureStorageAdapter(IOptions<AzureStorageOptions> options, ILogger<AzureStorageAdapter> logger)
-    {
-        _logger = logger;
-        _options = options.Value ?? throw new ArgumentException(nameof(AzureStorageOptions));
-    }
+    public AzureStorageAdapter(IOptions<AzureStorageOptions> options) => _options = options.Value ?? throw new ArgumentException(nameof(AzureStorageOptions));
 
     private async Task<BlobContainerClient> GetBlobClient()
     {

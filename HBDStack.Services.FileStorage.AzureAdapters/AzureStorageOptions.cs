@@ -1,4 +1,4 @@
-namespace HBDStack.Services.FileStorage.Options;
+namespace HBDStack.Services.FileStorage.AzureAdapters;
 
 public class AzureStorageOptions
 {

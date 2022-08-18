@@ -16,14 +16,15 @@
         <PackageTags>file storage, upload</PackageTags>
         <ImplicitUsings>true</ImplicitUsings>
         <PackageVersion />
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Azure.Storage.Blobs" Version="12.13.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+        <PackageReference Include="System.Memory.Data" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>

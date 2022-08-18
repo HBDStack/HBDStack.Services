@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Authors>Duy Hoang</Authors>
         <Company>HBD</Company>
@@ -25,6 +24,7 @@
         <PackageVersion>5.5.0</PackageVersion>
         <PackageIcon>NugetLogo.png</PackageIcon>
         <ImplicitUsings>true</ImplicitUsings>
+        <TargetFramework>netstandard2.1</TargetFramework>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -1,6 +1,6 @@
 using FluentAssertions;
 using HBDStack.Services.FileStorage.Abstracts;
-using HBDStack.Services.FileStorage.Options;
+using HBDStack.Services.FileStorage.Adapters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

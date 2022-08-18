@@ -21,7 +21,7 @@ public class FileServiceTests
             new ServiceCollection()
                 .AddLogging()
                 .AddFileService()
-                .AddAzureStorageAdapter(config)
+                //.AddAzureStorageAdapter(config)
                 .AddLocalFolderAdapter(config)
                 .BuildServiceProvider();
 

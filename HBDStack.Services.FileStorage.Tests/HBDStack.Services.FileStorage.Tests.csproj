@@ -23,6 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\HBDStack.Services.FileStorage.AzureAdapters\HBDStack.Services.FileStorage.AzureAdapters.csproj" />
       <ProjectReference Include="..\HBDStack.Services.FileStorage\HBDStack.Services.FileStorage.csproj" />
     </ItemGroup>
 
