@@ -1,14 +1,13 @@
 using FluentAssertions;
-using HBDStack.Services.FileStorage.AzureAdapters;
 using HBDStack.Services.FileStorage.Abstracts;
-using HBDStack.Services.FileStorage.Adapters;
+using HBDStack.Services.FileStorage.AwsS3Adapters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace HBDStack.Services.FileStorage.Tests;
 
-public class AzureStorageAdapterTest
+public class S3AdapterTest
 {
     private IFileAdapter _adapter;
 
@@ -22,8 +21,8 @@ public class AzureStorageAdapterTest
         var service =
             new ServiceCollection()
                 .AddLogging()
-                .AddSingleton<IFileAdapter, AzureStorageAdapter>()
-                .AddAzureStorageAdapter(config)
+                .AddSingleton<IFileAdapter, S3Adapter>()
+                .AddS3Adapter(config)
                 .BuildServiceProvider();
 
         _adapter = service.GetRequiredService<IFileAdapter>();
@@ -34,7 +33,7 @@ public class AzureStorageAdapterTest
     public async Task SaveNewFile()
     {
         var file = BinaryData.FromBytes(await File.ReadAllBytesAsync("TestData/log.txt"));
-        await _adapter.SaveFileAsync("log.txt", file);
+        await _adapter.SaveFileAsync("log.txt", file, true);
 
         (await _adapter.FileExistedAsync("log.txt")).Should().BeTrue();
     }
@@ -43,7 +42,7 @@ public class AzureStorageAdapterTest
     [Order(1)]
     public async Task SaveExistedFile()
     {
-        var file =BinaryData.FromBytes(await File.ReadAllBytesAsync("TestData/log.txt"));
+        var file = BinaryData.FromBytes(await File.ReadAllBytesAsync("TestData/log.txt"));
         var action = () => _adapter.SaveFileAsync("log.txt", file);
 
         await action.Should().ThrowAsync<Exception>();
@@ -77,35 +76,45 @@ public class AzureStorageAdapterTest
         file.Should().BeNull();
     }
 
-    [Test]
-    [Order(3)]
-    public async Task DeleteFile()
-    {
-        var rs = await _adapter.DeleteFileAsync("log.txt");
-        rs.Should().BeTrue();
-
-        rs = await _adapter.FileExistedAsync("log.txt");
-        rs.Should().BeFalse();
-    }
 
     [Test]
     [Order(0)]
     public async Task SaveNewFileSubFolder()
     {
         var file = BinaryData.FromBytes(await File.ReadAllBytesAsync("TestData/log.txt"));
-        await _adapter.SaveFileAsync("/sub/folder/log.txt", file);
+        await _adapter.SaveFileAsync("/sub/folder/log.txt", file, true);
 
         (await _adapter.FileExistedAsync("/sub/folder/log.txt"))
             .Should().BeTrue();
     }
 
     [Test]
+    [Order(3)]
+    public async Task DeleteFile()
+    {
+        const string fileName = "delete_log.txt";
+        await _adapter.SaveFileAsync(fileName,
+            BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/{fileName}")));
+
+        var rs = await _adapter.DeleteFileAsync(fileName);
+        rs.Should().BeTrue();
+
+        rs = await _adapter.FileExistedAsync(fileName);
+        rs.Should().BeFalse();
+    }
+
+    [Test]
     [Order(1)]
     public async Task DeleteFileSubFolder()
     {
-        await _adapter.DeleteFileAsync("/sub/folder/log.txt");
+        const string fileName = "delete_sub_folder_log.txt";
+        const string filePath = $"/sub/folder/{fileName}";
+        await _adapter.SaveFileAsync(filePath,
+            BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/{fileName}")));
 
-        (await _adapter.FileExistedAsync("/sub/folder/log.txt"))
+        await _adapter.DeleteFileAsync(filePath);
+
+        (await _adapter.FileExistedAsync(filePath))
             .Should().BeFalse();
     }
 }

@@ -1,9 +1,8 @@
 using HBDStack.Services.FileStorage.Abstracts;
-using HBDStack.Services.FileStorage.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace HBDStack.Services.FileStorage;
+namespace HBDStack.Services.FileStorage.Adapters;
 
 public class LocalFolderFileAdapter : IFileAdapter
 {

@@ -31,7 +31,7 @@ public class RealEmailSendingTests
     }
 
     [TestMethod]
-    public async System.Threading.Tasks.Task SendEmail_SendGrid_Async()
+    public async System.Threading.Tasks.Task SendEmail_SMTP4DEV_Async()
     {
         var config = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
