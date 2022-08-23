@@ -16,12 +16,11 @@ public class S3Adapter : IFileAdapter
 
     private TransferUtility GetS3Client()
     {
-        if (_client == null)
-        {
-            if (!string.IsNullOrWhiteSpace(_options.AccessKey) && !string.IsNullOrWhiteSpace(_options.Secret))
-                _client = new AmazonS3Client(new BasicAWSCredentials(_options.AccessKey, _options.Secret), RegionEndpoint.GetBySystemName(_options.RegionEndpointName));
-            else _client = new AmazonS3Client(RegionEndpoint.GetBySystemName(_options.RegionEndpointName));
-        }
+        if (_client != null) return new TransferUtility(_client);
+        
+        if (!string.IsNullOrWhiteSpace(_options.AccessKey) && !string.IsNullOrWhiteSpace(_options.Secret))
+            _client = new AmazonS3Client(new BasicAWSCredentials(_options.AccessKey, _options.Secret), RegionEndpoint.GetBySystemName(_options.RegionEndpointName));
+        else _client = new AmazonS3Client(RegionEndpoint.GetBySystemName(_options.RegionEndpointName));
 
         return new TransferUtility(_client);
     }
