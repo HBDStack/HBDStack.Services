@@ -23,6 +23,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\HBDStack.Services.FileStorage.AwsS3Adapters\HBDStack.Services.FileStorage.AwsS3Adapters.csproj" />
       <ProjectReference Include="..\HBDStack.Services.FileStorage.AzureAdapters\HBDStack.Services.FileStorage.AzureAdapters.csproj" />
       <ProjectReference Include="..\HBDStack.Services.FileStorage\HBDStack.Services.FileStorage.csproj" />
     </ItemGroup>
@@ -34,6 +35,16 @@
       <None Update="appsettings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="TestData\delete_sub_folder_log.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="TestData\delete_log.txt" />
+      <Content Include="TestData\delete_log.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>
