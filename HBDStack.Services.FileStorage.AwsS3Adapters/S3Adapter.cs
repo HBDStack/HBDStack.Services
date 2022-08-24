@@ -4,25 +4,38 @@ using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Transfer;
 using HBDStack.Services.FileStorage.Abstracts;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace HBDStack.Services.FileStorage.AwsS3Adapters;
 
 public class S3Adapter : IFileAdapter
 {
+    private readonly ILogger<S3Adapter> _logger;
     private readonly S3Options _options;
     private static IAmazonS3? _client;
 
-    public S3Adapter(IOptions<S3Options> options) => _options = options.Value;
+    public S3Adapter(IOptions<S3Options> options,ILogger<S3Adapter>logger)
+    {
+        _logger = logger;
+        _options = options.Value;
+    }
 
     private TransferUtility GetS3Client()
     {
         if (_client != null) return new TransferUtility(_client);
 
         if (!string.IsNullOrWhiteSpace(_options.AccessKey) && !string.IsNullOrWhiteSpace(_options.Secret))
+        {
             _client = new AmazonS3Client(new BasicAWSCredentials(_options.AccessKey, _options.Secret),
                 RegionEndpoint.GetBySystemName(_options.RegionEndpointName));
-        else _client = new AmazonS3Client(RegionEndpoint.GetBySystemName(_options.RegionEndpointName));
+            _logger.LogInformation("Loaded AmazonS3Client with BasicAWSCredentials");
+        }
+        else
+        {
+            _client = new AmazonS3Client(RegionEndpoint.GetBySystemName(_options.RegionEndpointName));
+            _logger.LogInformation("Loaded AmazonS3Client without Credentials");
+        }
 
         return new TransferUtility(_client);
     }
