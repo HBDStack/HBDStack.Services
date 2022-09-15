@@ -4,12 +4,20 @@ using HBDStack.Services.FileStorage.Adapters;
 using Microsoft.Extensions.Configuration;
 
 // ReSharper disable once CheckNamespace
-namespace  Microsoft.Extensions.DependencyInjection;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class FileServiceSetup
 {
-    public static IServiceCollection AddFileService(this IServiceCollection services) 
-        => services.Any(s => s.ServiceType == typeof(IFileService)) ? services : services.AddSingleton<IFileService, FileService>();
+    public static IServiceCollection AddFileService(this IServiceCollection services, FileServiceOptions? options = null)
+    {
+        if (services.Any(s => s.ServiceType == typeof(IFileService))) return services;
+
+        services
+            .AddSingleton(options ?? new FileServiceOptions())
+            .AddSingleton<IFileService, FileService>();
+
+        return services;
+    }
 
     public static IServiceCollection AddFileAdapter<TAdapter>(this IServiceCollection services)
         where TAdapter : class, IFileAdapter =>
@@ -19,6 +27,4 @@ public static class FileServiceSetup
         => services
             .Configure<LocalFolderOptions>(o => configuration.GetSection(LocalFolderOptions.Name).Bind(o))
             .AddFileAdapter<LocalFolderFileAdapter>();
-
-    
 }

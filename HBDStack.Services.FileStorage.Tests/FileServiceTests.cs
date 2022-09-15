@@ -20,7 +20,12 @@ public class FileServiceTests
         var service =
             new ServiceCollection()
                 .AddLogging()
-                .AddFileService()
+                .AddFileService(new FileServiceOptions
+                {
+                    MaxFileNameLength = 10,
+                    MaxFileSizeInMb = 1,
+                    IncludedExtensions = new []{".txt"}
+                })
                 //.AddAzureStorageAdapter(config)
                 .AddLocalFolderAdapter(config)
                 .BuildServiceProvider();
@@ -120,5 +125,41 @@ public class FileServiceTests
         
         (await _service.DeleteFileAsync(info)).Should().BeTrue();
         (await _service.GetFileAsync(info)).Should().BeNull();
+    }
+    
+    [Test]
+    [Order(4)]
+    public async Task FileName_Invalid()
+    {
+        var file = BinaryData.FromBytes(await File.ReadAllBytesAsync("TestData/log.txt"));
+        var info = new FileData(nameof(FileService), "log-1234567890-1234567890.txt", file) { OverwriteIfExisted = true };
+
+        var action = () => _service.SaveFileAsync(info);
+
+        await action.Should().ThrowAsync<FileLoadException>();
+    }
+    
+    [Test]
+    [Order(4)]
+    public async Task FileExtension_Invalid()
+    {
+        var file = BinaryData.FromBytes(await File.ReadAllBytesAsync("TestData/log.txt"));
+        var info = new FileData(nameof(FileService), "log.csv", file) { OverwriteIfExisted = true };
+
+        var action = () => _service.SaveFileAsync(info);
+
+        await action.Should().ThrowAsync<FileLoadException>();
+    }
+    
+    [Test]
+    [Order(4)]
+    public async Task FileData_Invalid()
+    {
+        var file = BinaryData.FromBytes(await File.ReadAllBytesAsync("TestData/big_log.txt"));
+        var info = new FileData(nameof(FileService), "log-123.txt", file) { OverwriteIfExisted = true };
+
+        var action = () => _service.SaveFileAsync(info);
+
+        await action.Should().ThrowAsync<FileLoadException>();
     }
 }
