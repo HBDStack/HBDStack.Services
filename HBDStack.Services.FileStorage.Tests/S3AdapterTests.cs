@@ -104,7 +104,7 @@ public class S3AdapterTest
     }
 
     [Test]
-    [Order(1)]
+    [Order(4)]
     public async Task DeleteFileSubFolder()
     {
         const string fileName = "delete_sub_folder_log.txt";
@@ -116,5 +116,22 @@ public class S3AdapterTest
 
         (await _adapter.FileExistedAsync(filePath))
             .Should().BeFalse();
+    }
+
+    [Test]
+    [Order(4)]
+    public async Task DeleteFolder()
+    {
+        await _adapter.SaveFileAsync("/folderToDelete/log1.txt",
+            BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/log.txt")), true);
+
+        await _adapter.SaveFileAsync("/folderToDelete/log2.txt",
+            BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/log.txt")), true);
+
+        await _adapter.SaveFileAsync("/folderToDelete/subfolderToDelete/log3.txt",
+            BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/log.txt")), true);
+
+        var result = await _adapter.DeleteFolderAsync("/folderToDelete/");
+        Assert.True(result);
     }
 }

@@ -61,6 +61,15 @@ public class LocalFolderFileAdapter : IFileAdapter
         }
     }
 
+    public Task<bool> DeleteFolderAsync(string folderLocation, CancellationToken cancellationToken = default)
+    {
+        if (!Directory.Exists(folderLocation))
+            throw new ArgumentException($"The directory {folderLocation} was not found");
+
+        Directory.Delete(folderLocation);
+        return Task.FromResult(true);
+    }
+
     public Task<bool> FileExistedAsync(string fileLocation, CancellationToken cancellationToken = default)
     {
         var finalFile = GetFinalPath(fileLocation);

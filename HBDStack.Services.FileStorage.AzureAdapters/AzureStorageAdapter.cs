@@ -1,4 +1,5 @@
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using HBDStack.Services.FileStorage.Abstracts;
 using HBDStack.Services.FileStorage.Adapters;
 using Microsoft.Extensions.Options;
@@ -10,7 +11,8 @@ public class AzureStorageAdapter : IFileAdapter
     private readonly AzureStorageOptions _options;
     private BlobContainerClient? _containerClient;
 
-    public AzureStorageAdapter(IOptions<AzureStorageOptions> options) => _options = options.Value ?? throw new ArgumentException(nameof(AzureStorageOptions));
+    public AzureStorageAdapter(IOptions<AzureStorageOptions> options) =>
+        _options = options.Value ?? throw new ArgumentException(nameof(AzureStorageOptions));
 
     private async Task<BlobContainerClient> GetBlobClient()
     {
@@ -46,6 +48,30 @@ public class AzureStorageAdapter : IFileAdapter
         var client = await GetBlobClient();
         var rs = await client.GetBlobClient(fileLocation).DeleteIfExistsAsync(cancellationToken: cancellationToken);
         return rs.Value;
+    }
+
+    public async Task<bool> DeleteFolderAsync(string folderLocation, CancellationToken cancellationToken = default)
+    {
+        var client = await GetBlobClient();
+        var resultSegment = client.GetBlobsAsync(BlobTraits.All, BlobStates.All, folderLocation).AsPages(default, 1000);
+
+        await foreach (Azure.Page<BlobItem> blobPage in resultSegment.WithCancellation(cancellationToken))
+        {
+            var subFolders = blobPage.Values.Where(blobItem => blobItem.Metadata.ContainsKey("hdi_isfolder"));
+            var files = blobPage.Values.Where(blobItem => subFolders.All(i => i.Name != blobItem.Name));
+
+            foreach (var blobItem in files)
+            {
+                await DeleteFileAsync(blobItem.Name, cancellationToken);
+            }
+
+            foreach (var blobItem in subFolders)
+            {
+                await DeleteFileAsync(blobItem.Name, cancellationToken);
+            }
+        }
+
+        return await DeleteFileAsync(folderLocation, cancellationToken);
     }
 
     public async Task<bool> FileExistedAsync(string fileLocation, CancellationToken cancellationToken = default)

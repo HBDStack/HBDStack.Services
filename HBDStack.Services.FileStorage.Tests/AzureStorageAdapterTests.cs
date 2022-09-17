@@ -108,4 +108,21 @@ public class AzureStorageAdapterTest
         (await _adapter.FileExistedAsync("/sub/folder/log.txt"))
             .Should().BeFalse();
     }
+    
+    [Test]
+    [Order(4)]
+    public async Task DeleteFolder()
+    {
+        await _adapter.SaveFileAsync("/folderToDelete/log1.txt",
+            BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/log.txt")), true);
+        
+        await _adapter.SaveFileAsync("/folderToDelete/log2.txt",
+            BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/log.txt")), true);
+        
+        await _adapter.SaveFileAsync("/folderToDelete/subfolderToDelete/log3.txt",
+            BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/log.txt")), true);
+
+        var result = await _adapter.DeleteFolderAsync("/folderToDelete/");
+        Assert.True(result);
+    }
 }

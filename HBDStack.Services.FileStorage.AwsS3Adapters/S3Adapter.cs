@@ -15,7 +15,7 @@ public class S3Adapter : IFileAdapter
     private readonly S3Options _options;
     private static IAmazonS3? _client;
 
-    public S3Adapter(IOptions<S3Options> options,ILogger<S3Adapter>logger)
+    public S3Adapter(IOptions<S3Options> options, ILogger<S3Adapter> logger)
     {
         _logger = logger;
         _options = options.Value;
@@ -77,6 +77,21 @@ public class S3Adapter : IFileAdapter
         var response =
             await transfer.S3Client.DeleteObjectAsync(_options.BucketName, fileLocation, cancellationToken);
         return response.HttpStatusCode == HttpStatusCode.NoContent;
+    }
+
+    public async Task<bool> DeleteFolderAsync(string folderLocation, CancellationToken cancellationToken = default)
+    {
+        var transfer = GetS3Client();
+        var listObjectsResponse =
+            await transfer.S3Client.ListObjectsAsync(_options.BucketName, folderLocation, cancellationToken);
+        if (listObjectsResponse.HttpStatusCode != HttpStatusCode.OK) return false;
+
+        foreach (var s3Object in listObjectsResponse.S3Objects)
+        {
+            await transfer.S3Client.DeleteObjectAsync(_options.BucketName, s3Object.Key, cancellationToken);
+        }
+
+        return true;
     }
 
     public async Task<bool> FileExistedAsync(string fileLocation, CancellationToken cancellationToken = default)
