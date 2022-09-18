@@ -1,7 +1,7 @@
+using System.Runtime.CompilerServices;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using HBDStack.Services.FileStorage.Abstracts;
-using HBDStack.Services.FileStorage.Adapters;
 using Microsoft.Extensions.Options;
 
 namespace HBDStack.Services.FileStorage.AzureAdapters;
@@ -43,6 +43,22 @@ public class AzureStorageAdapter : IFileAdapter
         return rs.Value!.Content;
     }
 
+    public async IAsyncEnumerable<ObjectInfo> ListObjectInfoAsync(string location, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var client = await GetBlobClient();
+        location = location.RemoveHeadingSlash();
+        var resultSegment = client.GetBlobsAsync(BlobTraits.None, BlobStates.All, location, cancellationToken);
+
+        await foreach (var blob in resultSegment)
+        {
+            yield return new ObjectInfo(location, blob.Name,
+                blob.Properties.ContentLength!.Value,
+                blob.Properties.CreatedOn!.Value.LocalDateTime,
+                blob.Properties.LastModified!.Value.LocalDateTime,
+                blob.IsDirectory() ? ObjectTypes.Directory : ObjectTypes.File);
+        }
+    }
+
     public async Task<bool> DeleteFileAsync(string fileLocation, CancellationToken cancellationToken = default)
     {
         var client = await GetBlobClient();
@@ -53,25 +69,35 @@ public class AzureStorageAdapter : IFileAdapter
     public async Task<bool> DeleteFolderAsync(string folderLocation, CancellationToken cancellationToken = default)
     {
         var client = await GetBlobClient();
-        var resultSegment = client.GetBlobsAsync(BlobTraits.All, BlobStates.All, folderLocation).AsPages(default, 1000);
+        var queue = new Queue<string>();
+        var subStack = new Stack<string>();
+        queue.Enqueue(folderLocation.EnsureTrailingSlash());
 
-        await foreach (Azure.Page<BlobItem> blobPage in resultSegment.WithCancellation(cancellationToken))
+        while (queue.Count > 0)
         {
-            var subFolders = blobPage.Values.Where(blobItem => blobItem.Metadata.ContainsKey("hdi_isfolder"));
-            var files = blobPage.Values.Where(blobItem => subFolders.All(i => i.Name != blobItem.Name));
+            var tbDelete = queue.Dequeue();
+            var resultSegment = client.GetBlobsAsync(BlobTraits.None, BlobStates.All, tbDelete, cancellationToken);
 
-            foreach (var blobItem in files)
+            //Delete Files
+            await foreach (var blob in resultSegment.WithCancellation(cancellationToken))
             {
-                await DeleteFileAsync(blobItem.Name, cancellationToken);
+                if (blob.IsDirectory())
+                    queue.Enqueue(blob.Name.EnsureTrailingSlash());
+                else await DeleteFileAsync(blob.Name, cancellationToken);
             }
 
-            foreach (var blobItem in subFolders)
-            {
-                await DeleteFileAsync(blobItem.Name, cancellationToken);
-            }
+            //Add Empty folder to stack and delete later
+            subStack.Push(tbDelete);
         }
 
-        return await DeleteFileAsync(folderLocation, cancellationToken);
+        //Delete all empty Subfolders and folder
+        while (subStack.Count > 0)
+        {
+            await DeleteFileAsync(subStack.Pop(), cancellationToken);
+        }
+
+        //Tobe True or Exception.
+        return true;
     }
 
     public async Task<bool> FileExistedAsync(string fileLocation, CancellationToken cancellationToken = default)

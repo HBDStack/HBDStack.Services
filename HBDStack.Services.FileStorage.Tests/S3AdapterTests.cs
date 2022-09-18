@@ -1,4 +1,5 @@
 using FluentAssertions;
+using HBDStack.Framework.Extensions;
 using HBDStack.Services.FileStorage.Abstracts;
 using HBDStack.Services.FileStorage.AwsS3Adapters;
 using Microsoft.Extensions.Configuration;
@@ -70,6 +71,13 @@ public class S3AdapterTest
 
     [Test]
     [Order(2)]
+    public async Task ListFile()
+    {
+        (await _adapter.ListObjectInfoAsync("/").ToListAsync()).Should().HaveCountGreaterOrEqualTo(1);
+    }
+    
+    [Test]
+    [Order(2)]
     public async Task GetNotExistedFile()
     {
         var file = await _adapter.GetFileAsync("/sub/hello_log.txt");
@@ -94,7 +102,7 @@ public class S3AdapterTest
     {
         const string fileName = "delete_log.txt";
         await _adapter.SaveFileAsync(fileName,
-            BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/{fileName}")));
+            BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/{fileName}")), true);
 
         var rs = await _adapter.DeleteFileAsync(fileName);
         rs.Should().BeTrue();
@@ -109,8 +117,9 @@ public class S3AdapterTest
     {
         const string fileName = "delete_sub_folder_log.txt";
         const string filePath = $"/sub/folder/{fileName}";
+
         await _adapter.SaveFileAsync(filePath,
-            BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/{fileName}")));
+            BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/{fileName}")), true);
 
         await _adapter.DeleteFileAsync(filePath);
 

@@ -1,6 +1,8 @@
+using System.Runtime.CompilerServices;
 using HBDStack.Services.FileStorage.Abstracts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+#pragma warning disable CS1998
 
 namespace HBDStack.Services.FileStorage.Adapters;
 
@@ -43,6 +45,34 @@ public class LocalFolderFileAdapter : IFileAdapter
 
         var bytes = await File.ReadAllBytesAsync(finalFile, cancellationToken);
         return BinaryData.FromBytes(bytes);
+    }
+    
+    public async IAsyncEnumerable<ObjectInfo> ListObjectInfoAsync(string location, [EnumeratorCancellation]CancellationToken cancellationToken = default)
+    {
+        var internalLocation = GetFinalPath(location);
+        
+        if (internalLocation.IsDirectory())
+        {
+            var directory = new DirectoryInfo(internalLocation);
+
+            foreach (var file in directory.EnumerateFiles("*", SearchOption.AllDirectories))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                yield return new ObjectInfo(location, file.Name, file.Length, file.CreationTime, file.LastWriteTime);
+            }
+
+            foreach (var file in directory.EnumerateDirectories("*", SearchOption.AllDirectories))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                yield return new ObjectInfo(location, file.Name, 0, file.CreationTime, file.LastWriteTime, ObjectTypes.Directory);
+            }
+        }
+        else
+        {
+            var file = new FileInfo(internalLocation);
+            if (file.Exists)
+                yield return new ObjectInfo(location, file.Name, file.Length, file.CreationTime, file.LastWriteTime);
+        }
     }
 
     public Task<bool> DeleteFileAsync(string fileLocation, CancellationToken cancellationToken = default)

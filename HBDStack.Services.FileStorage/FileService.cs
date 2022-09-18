@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 using HBDStack.Services.FileStorage.Abstracts;
 
@@ -38,10 +39,10 @@ public class FileService : IFileService
         if (_options.IncludedExtensions != null)
         {
             var ext = Path.GetExtension(file.Name);
-            if(string.IsNullOrEmpty(ext))
+            if (string.IsNullOrEmpty(ext))
                 throw new FileLoadException("File extension is invalid.");
-            
-            if(!_options.IncludedExtensions.Any(e=>string.Equals(e,ext,StringComparison.CurrentCultureIgnoreCase)))
+
+            if (!_options.IncludedExtensions.Any(e => string.Equals(e, ext, StringComparison.CurrentCultureIgnoreCase)))
                 throw new FileLoadException("File extension is invalid.");
         }
 
@@ -83,6 +84,34 @@ public class FileService : IFileService
         }
 
         return null;
+    }
+
+    public Task<ObjectInfo?> GetObjectInfoAsync(FileArgs file, CancellationToken cancellationToken = default)
+    {
+        var fileLocation = GetFileLocation(file);
+        return GetObjectInfoAsync(fileLocation, cancellationToken);
+    }
+
+    public async Task<ObjectInfo?> GetObjectInfoAsync(string fileLocation, CancellationToken cancellationToken = default)
+    {
+        foreach (var adapter in _adapters)
+        {
+            await foreach (var file in adapter.ListObjectInfoAsync(fileLocation, cancellationToken))
+                return file;
+        }
+
+        return null;
+    }
+
+    public async IAsyncEnumerable<ObjectInfo> ListObjectInfoAsync(string location,[EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var adapter = _adapters.First();
+
+        await foreach (var file in adapter.ListObjectInfoAsync(location, cancellationToken))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            yield return file;
+        }
     }
 
     public Task<bool> DeleteFileAsync(FileArgs file, CancellationToken cancellationToken = default)

@@ -1,7 +1,9 @@
 using System.Net;
+using System.Runtime.CompilerServices;
 using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
+using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using HBDStack.Services.FileStorage.Abstracts;
 using Microsoft.Extensions.Logging;
@@ -25,10 +27,20 @@ public class S3Adapter : IFileAdapter
     {
         if (_client != null) return new TransferUtility(_client);
 
+        var isLocal = string.IsNullOrEmpty(_options.RegionEndpointName);
+        var config = new AmazonS3Config
+        {
+            ServiceURL = _options.ConnectionString,
+            UseHttp = !_options.ConnectionString.StartsWith("https", StringComparison.CurrentCultureIgnoreCase),
+            ForcePathStyle = isLocal,
+            AuthenticationRegion = _options.RegionEndpointName
+        };
+
         if (!string.IsNullOrWhiteSpace(_options.AccessKey) && !string.IsNullOrWhiteSpace(_options.Secret))
         {
-            _client = new AmazonS3Client(new BasicAWSCredentials(_options.AccessKey, _options.Secret),
-                RegionEndpoint.GetBySystemName(_options.RegionEndpointName));
+            _client = isLocal
+                ? new AmazonS3Client(new BasicAWSCredentials(_options.AccessKey, _options.Secret), config)
+                : new AmazonS3Client(new BasicAWSCredentials(_options.AccessKey, _options.Secret), RegionEndpoint.GetBySystemName(_options.RegionEndpointName));
             _logger.LogInformation("Loaded AmazonS3Client with BasicAWSCredentials");
         }
         else
@@ -67,6 +79,19 @@ public class S3Adapter : IFileAdapter
         }
     }
 
+    public async IAsyncEnumerable<ObjectInfo> ListObjectInfoAsync(string location, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var transfer = GetS3Client();
+        var info = await transfer.S3Client.ListObjectsAsync(_options.BucketName, location, cancellationToken);
+        if (info == null) yield break;
+
+        foreach (var obj in info.S3Objects)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            yield return new ObjectInfo(_options.BucketName, obj.Key, obj.Size, obj.LastModified, obj.LastModified, obj.Size <= 0 ? ObjectTypes.Directory : ObjectTypes.File);
+        }
+    }
+
     public async Task<bool> DeleteFileAsync(string fileLocation, CancellationToken cancellationToken = default)
     {
         var transfer = GetS3Client();
@@ -82,15 +107,20 @@ public class S3Adapter : IFileAdapter
     public async Task<bool> DeleteFolderAsync(string folderLocation, CancellationToken cancellationToken = default)
     {
         var transfer = GetS3Client();
-        var listObjectsResponse =
-            await transfer.S3Client.ListObjectsAsync(_options.BucketName, folderLocation, cancellationToken);
-        if (listObjectsResponse.HttpStatusCode != HttpStatusCode.OK) return false;
-
-        foreach (var s3Object in listObjectsResponse.S3Objects)
+        do
         {
-            await transfer.S3Client.DeleteObjectAsync(_options.BucketName, s3Object.Key, cancellationToken);
-        }
+            var info = await transfer.S3Client.ListObjectsAsync(_options.BucketName, folderLocation, cancellationToken);
+            if (info == null || !info.S3Objects.Any())
+                break;
 
+            foreach (var obj in info.S3Objects)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await transfer.S3Client.DeleteObjectAsync(obj.BucketName, obj.Key, cancellationToken);
+            }
+        } while (true);
+
+        await transfer.S3Client.DeleteObjectAsync(_options.BucketName, folderLocation, cancellationToken);
         return true;
     }
 
@@ -99,9 +129,13 @@ public class S3Adapter : IFileAdapter
         var transfer = GetS3Client();
         try
         {
-            var response =
-                await transfer.S3Client.GetObjectMetadataAsync(_options.BucketName, fileLocation, cancellationToken);
-            return response is { ContentLength: > 0 };
+            var response = await transfer.S3Client.ListObjectsV2Async(new ListObjectsV2Request
+            {
+                BucketName = _options.BucketName,
+                Prefix = fileLocation,
+                MaxKeys = 1
+            }, cancellationToken);
+            return response.S3Objects.Any(s => s.Key.Equals(fileLocation, StringComparison.CurrentCultureIgnoreCase));
         }
         catch (AmazonS3Exception e)
         {

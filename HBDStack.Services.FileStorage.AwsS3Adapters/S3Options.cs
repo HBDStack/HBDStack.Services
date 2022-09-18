@@ -4,6 +4,8 @@ public class S3Options
 {
     public static string Name => "FileService:S3";
     
+    public string ConnectionString { get; set; }= default!;
+    
     /// <summary>
     /// The Name of RegionEnd ex: ap-southeast-1, ap-east-1 or ca-central-1 ...
     /// </summary>

@@ -1,4 +1,5 @@
 using FluentAssertions;
+using HBDStack.Framework.Extensions;
 using HBDStack.Services.FileStorage.Abstracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -107,6 +108,16 @@ public class FileServiceTests
     {
         var info = new FileArgs(nameof(FileService), "log.txt");
         (await _service.GetFileAsync(info)).Should().NotBeNull();
+    }
+    
+    [Test]
+    [Order(2)]
+    public async Task ListFile()
+    {
+        (await _service.ListObjectInfoAsync("/").ToListAsync()).Should().HaveCountGreaterOrEqualTo(1);
+        
+        var info = new FileArgs(nameof(FileService), "log.txt");
+        (await _service.GetObjectInfoAsync(info)).Should().NotBeNull();
     }
     
     [Test]

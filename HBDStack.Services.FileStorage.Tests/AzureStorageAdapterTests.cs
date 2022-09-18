@@ -1,7 +1,7 @@
 using FluentAssertions;
+using HBDStack.Framework.Extensions;
 using HBDStack.Services.FileStorage.AzureAdapters;
 using HBDStack.Services.FileStorage.Abstracts;
-using HBDStack.Services.FileStorage.Adapters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
@@ -71,6 +71,13 @@ public class AzureStorageAdapterTest
 
     [Test]
     [Order(2)]
+    public async Task ListFile()
+    {
+        (await _adapter.ListObjectInfoAsync("/").ToListAsync()).Should().HaveCountGreaterOrEqualTo(1);
+    }
+    
+    [Test]
+    [Order(2)]
     public async Task GetNotExistedFile()
     {
         var file = await _adapter.GetFileAsync("/sub/hello_log.txt");
@@ -122,7 +129,7 @@ public class AzureStorageAdapterTest
         await _adapter.SaveFileAsync("/folderToDelete/subfolderToDelete/log3.txt",
             BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/log.txt")), true);
 
-        var result = await _adapter.DeleteFolderAsync("/folderToDelete/");
+        var result = await _adapter.DeleteFolderAsync("/folderToDelete");
         Assert.True(result);
     }
 }
