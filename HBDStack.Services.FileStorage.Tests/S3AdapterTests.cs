@@ -1,5 +1,4 @@
 using FluentAssertions;
-using HBDStack.Framework.Extensions;
 using HBDStack.Services.FileStorage.Abstracts;
 using HBDStack.Services.FileStorage.AwsS3Adapters;
 using Microsoft.Extensions.Configuration;
