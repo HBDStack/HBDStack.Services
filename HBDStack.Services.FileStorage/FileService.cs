@@ -92,7 +92,8 @@ public class FileService : IFileService
         return GetObjectInfoAsync(fileLocation, cancellationToken);
     }
 
-    public async Task<ObjectInfo?> GetObjectInfoAsync(string fileLocation, CancellationToken cancellationToken = default)
+    public async Task<ObjectInfo?> GetObjectInfoAsync(string fileLocation,
+        CancellationToken cancellationToken = default)
     {
         foreach (var adapter in _adapters)
         {
@@ -103,7 +104,8 @@ public class FileService : IFileService
         return null;
     }
 
-    public async IAsyncEnumerable<ObjectInfo> ListObjectInfoAsync(string location,[EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<ObjectInfo> ListObjectInfoAsync(string location,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var adapter = _adapters.First();
 
@@ -128,5 +130,26 @@ public class FileService : IFileService
 
         var rs = await Task.WhenAll(tasks);
         return rs.Any(r => r);
+    }
+
+    public async Task<bool> DeleteFolderAsync(string folderLocation, CancellationToken cancellationToken = default)
+    {
+        var tasks = _adapters.Select(a =>
+            a.DeleteFolderAsync(folderLocation, cancellationToken));
+
+        var rs = await Task.WhenAll(tasks);
+        return rs.Any(r => r);
+    }
+
+    public async Task<bool> FileExistedAsync(string fileLocation, CancellationToken cancellationToken = default)
+    {
+        foreach (var adapter in _adapters)
+        {
+            var rs = await adapter.FileExistedAsync(fileLocation, cancellationToken);
+            if (rs)
+                return rs;
+        }
+
+        return false;
     }
 }

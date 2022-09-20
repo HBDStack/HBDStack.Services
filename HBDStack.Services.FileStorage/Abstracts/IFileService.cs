@@ -18,4 +18,6 @@ public interface IFileService
     
     Task<bool> DeleteFileAsync(FileArgs file, CancellationToken cancellationToken = default);
     Task<bool> DeleteFileAsync(string fileLocation, CancellationToken cancellationToken = default);
+    Task<bool> DeleteFolderAsync(string folderLocation, CancellationToken cancellationToken = default);
+    Task<bool> FileExistedAsync(string fileLocation, CancellationToken cancellationToken = default);
 }
