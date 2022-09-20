@@ -22,11 +22,11 @@ public class FileServiceTests
                 .AddLogging()
                 .AddFileService(new FileServiceOptions
                 {
-                    MaxFileNameLength = 10,
+                    MaxFileNameLength = 50,
                     MaxFileSizeInMb = 1,
-                    IncludedExtensions = new []{".txt"}
+                    IncludedExtensions = new[] { ".txt" }
                 })
-                //.AddAzureStorageAdapter(config)
+                .AddAzureStorageAdapter(config)
                 .AddLocalFolderAdapter(config)
                 .BuildServiceProvider();
 
@@ -45,34 +45,34 @@ public class FileServiceTests
         rs.Should().Be($"{nameof(FileService)}/log.txt");
         (await _service.GetFileAsync(rs)).ToString().Should().Be(file.ToString());
     }
-    
+
     [Test]
     [Order(0)]
     public async Task SaveNewFile_WithoutOwnerId()
     {
         var file = BinaryData.FromBytes(await File.ReadAllBytesAsync("TestData/log.txt"));
-        var rs =()=>new FileData(null, "log.txt", file);
-        
+        var rs = () => new FileData(null, "log.txt", file);
+
         rs.Should().Throw<ArgumentNullException>();
     }
-    
+
     [Test]
     [Order(0)]
     public async Task SaveNewFile_WithoutFileName()
     {
         var file = BinaryData.FromBytes(await File.ReadAllBytesAsync("TestData/log.txt"));
-        var rs =()=> new FileData(nameof(FileService), null, file);
+        var rs = () => new FileData(nameof(FileService), null, file);
 
         rs.Should().Throw<ArgumentNullException>();
     }
-    
+
     [Test]
     [Order(0)]
     public async Task SaveNewFile_WithoutData()
     {
         var file = BinaryData.FromBytes(await File.ReadAllBytesAsync("TestData/log.txt"));
-        var rs =()=> new FileData(nameof(FileService), "log.txt", null);
-        
+        var rs = () => new FileData(nameof(FileService), "log.txt", null);
+
         rs.Should().Throw<ArgumentNullException>();
     }
 
@@ -108,17 +108,24 @@ public class FileServiceTests
         var info = new FileArgs(nameof(FileService), "log.txt");
         (await _service.GetFileAsync(info)).Should().NotBeNull();
     }
-    
+
+    [Test]
+    [Order(2)]
+    public async Task CheckFileExisted()
+    {
+        (await _service.FileExistedAsync($"{nameof(FileService)}/log.txt")).Should().BeTrue();
+    }
+
     [Test]
     [Order(2)]
     public async Task ListFile()
     {
         (await _service.ListObjectInfoAsync("/").ToListAsync()).Should().HaveCountGreaterOrEqualTo(1);
-        
+
         var info = new FileArgs(nameof(FileService), "log.txt");
         (await _service.GetObjectInfoAsync(info)).Should().NotBeNull();
     }
-    
+
     [Test]
     [Order(2)]
     public async Task GetNotExistedFile()
@@ -126,29 +133,61 @@ public class FileServiceTests
         var info = new FileArgs(nameof(FileService), "hello.txt");
         (await _service.GetFileAsync(info)).Should().BeNull();
     }
-    
+
     [Test]
     [Order(3)]
     public async Task DeleteFile()
     {
         var info = new FileArgs(nameof(FileService), "log.txt");
-        
+
         (await _service.DeleteFileAsync(info)).Should().BeTrue();
         (await _service.GetFileAsync(info)).Should().BeNull();
     }
-    
+
+    [Test]
+    [Order(3)]
+    public async Task DeleteFolder()
+    {
+        var fileContent = BinaryData.FromBytes(await File.ReadAllBytesAsync($"TestData/log.txt"));
+
+        var file = new FileData(nameof(FileService), "/Delete/log1.txt", fileContent)
+        {
+            OverwriteIfExisted = true
+        };
+        var path = await _service.SaveFileAsync(file);
+        path.Should().NotBeNull();
+
+        file = new FileData(nameof(FileService), "/Delete/log2.txt", fileContent)
+        {
+            OverwriteIfExisted = true
+        };
+        path = await _service.SaveFileAsync(file);
+        path.Should().NotBeNull();
+
+        file = new FileData(nameof(FileService), "/Delete/a/log3.txt", fileContent)
+        {
+            OverwriteIfExisted = true
+        };
+        path = await _service.SaveFileAsync(file);
+        path.Should().NotBeNull();
+
+        var result = await _service.DeleteFolderAsync($"/{nameof(FileService)}/Delete");
+        Assert.True(result);
+    }
+
     [Test]
     [Order(4)]
     public async Task FileName_Invalid()
     {
         var file = BinaryData.FromBytes(await File.ReadAllBytesAsync("TestData/log.txt"));
-        var info = new FileData(nameof(FileService), "log-1234567890-1234567890.txt", file) { OverwriteIfExisted = true };
+        var info = new FileData(nameof(FileService), "log-1234567890-1234567890-1234567890-1234567890.txt", file)
+            { OverwriteIfExisted = true };
 
         var action = () => _service.SaveFileAsync(info);
 
         await action.Should().ThrowAsync<FileLoadException>();
     }
-    
+
     [Test]
     [Order(4)]
     public async Task FileExtension_Invalid()
@@ -160,7 +199,7 @@ public class FileServiceTests
 
         await action.Should().ThrowAsync<FileLoadException>();
     }
-    
+
     [Test]
     [Order(4)]
     public async Task FileData_Invalid()
